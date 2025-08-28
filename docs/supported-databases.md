@@ -1,20 +1,21 @@
 # List of supported databases
 
-| Database      | Status | Connection string |
-|---------------|-------------------------------------------------------------------------------------------------------------------------------------|--------|
+| Database        | Status | Connection string |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------|--------|
 | PostgreSQL >=10 |  💚    | `postgresql://<user>:<password>@<host>:5432/<database>`          |
-| MySQL         |  💚    | `mysql://<user>:<password>@<hostname>:5432/<database>`             |
-| Snowflake     |  💚    | `"snowflake://<user>[:<password>]@<account>/<database>/<SCHEMA>?warehouse=<WAREHOUSE>&role=<role>[&authenticator=externalbrowser]"` |
-| Redshift      |  💚    | `redshift://<username>:<password>@<hostname>:5439/<database>`    |
-| DuckDB >= 0.6       |  💚    | `duckdb://<file>`  |
-| Trino         |  💚    | `trino://<username>:<password>@<hostname>:8080/<database>`      |
-| BigQuery      |  💛    | `bigquery://<project>/<dataset>`                                |
-| Oracle        |  💛    | `oracle://<username>:<password>@<hostname>/database`            |
-| Presto        |  💛    | `presto://<username>:<password>@<hostname>:8080/<database>`     |
-| Vertica       |  💛    | `vertica://<username>:<password>@<hostname>:5433/<database>`   |
-| Clickhouse    |  💛    | `clickhouse://<username>:<password>@<hostname>:9000/<database>` |
-| Databricks    |  💛    | `databricks://<http_path>:<access_token>@<server_hostname>/<catalog>/<schema>`     |
-| SQLite        |  📝    |                                                                                                                                     |
+| MySQL           |  💚    | `mysql://<user>:<password>@<hostname>:5432/<database>`             |
+| Snowflake       |  💚    | `"snowflake://<user>[:<password>]@<account>/<database>/<SCHEMA>?warehouse=<WAREHOUSE>&role=<role>[&authenticator=externalbrowser]"` |
+| Redshift        |  💚    | `redshift://<username>:<password>@<hostname>:5439/<database>`    |
+| DuckDB >= 0.6   |  💚    | `duckdb://<file>`  |
+| Trino           |  💚    | `trino://<username>:<password>@<hostname>:8080/<database>`      |
+| BigQuery        |  💛    | `bigquery://<project>/<dataset>`                                |
+| Oracle          |  💛    | `oracle://<username>:<password>@<hostname>/database`            |
+| Presto          |  💛    | `presto://<username>:<password>@<hostname>:8080/<database>`     |
+| Vertica         |  💛    | `vertica://<username>:<password>@<hostname>:5433/<database>`   |
+| Clickhouse      |  💛    | `clickhouse://<username>:<password>@<hostname>:9000/<database>` |
+| Databricks      |  💛    | `databricks://<http_path>:<access_token>@<server_hostname>/<catalog>/<schema>`     |
+| Dremio          |  💛    | `dremio://<username>:<password>@<hostname>:32010/<space>`      |
+| SQLite          |  📝    |                                                                                                                                     |
 
 * 💚: Implemented and thoroughly tested.
 * 💛: Implemented, but not thoroughly tested yet.

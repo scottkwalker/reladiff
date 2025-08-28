@@ -64,7 +64,6 @@ class TestApi(DiffTestCase):
         with diff_tables(t1, t2) as diff:
             assert len(list(diff)) == 0
 
-
     def test_api_get_stats_dict(self):
         # XXX Likely to change in the future
         expected_dict = {

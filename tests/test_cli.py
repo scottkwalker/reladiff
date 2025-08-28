@@ -3,6 +3,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta
 
+from reladiff import databases as db
 from sqeleton.queries import commit, current_timestamp
 
 from .common import DiffTestCase, CONN_STRINGS
@@ -34,19 +35,22 @@ class TestCLI(DiffTestCase):
             (now - timedelta(seconds=6), "c"),
         ]
 
-        self.connection.query(
-            [
-                self.src_table.insert_rows((i, ts, s) for i, (ts, s) in enumerate(rows)),
-                self.dst_table.create(self.src_table),
-                self.src_table.insert_row(len(rows), now - timedelta(seconds=3), "3 seconds ago"),
-                commit,
-            ]
-        )
+        queries = [
+            self.src_table.insert_rows((i, ts, s) for i, (ts, s) in enumerate(rows)),
+            self.dst_table.create(self.src_table),
+            self.src_table.insert_row(len(rows), now - timedelta(seconds=3), "3 seconds ago"),
+            commit,
+        ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
+
+        self.connection.query(queries)
 
     def test_basic(self):
         conn_str = CONN_STRINGS[self.db_cls]
         diff = run_reladiff_cli(conn_str, self.table_src_name, conn_str, self.table_dst_name)
-        assert len(diff) == 1
+        assert len(diff) == 1, diff
 
     def test_options(self):
         conn_str = CONN_STRINGS[self.db_cls]
@@ -86,16 +90,19 @@ class TestCLI_CaseSensitive(DiffTestCase):
             (now - timedelta(seconds=6), "c"),
         ]
 
-        self.connection.query(
-            [
-                self.src_table.insert_rows((i, ts, s) for i, (ts, s) in enumerate(rows)),
-                self.dst_table.create(self.src_table),
-                self.src_table.insert_row(len(rows), now - timedelta(seconds=3), "3 seconds ago"),
-                commit,
-            ]
-        )
+        queries = [
+            self.src_table.insert_rows((i, ts, s) for i, (ts, s) in enumerate(rows)),
+            self.dst_table.create(self.src_table),
+            self.src_table.insert_row(len(rows), now - timedelta(seconds=3), "3 seconds ago"),
+            commit,
+        ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
+
+        self.connection.query(queries)
 
     def test_cli_case_sensitive(self):
         conn_str = CONN_STRINGS[self.db_cls]
         diff = run_reladiff_cli(conn_str, self.table_src_name, conn_str, self.table_dst_name)
-        assert len(diff) == 1
+        assert len(diff) == 1, diff

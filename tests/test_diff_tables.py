@@ -23,7 +23,9 @@ TEST_DATABASES = {
     db.BigQuery,
     db.Presto,
     db.Trino,
-    db.Vertica,
+    # The vertica docker image is 404
+    # db.Vertica,
+    db.Dremio,
 }
 
 test_each_database: Callable = test_each_database_in_list(TEST_DATABASES)
@@ -356,14 +358,17 @@ class TestUUIDs(DiffTestCase):
 
         self.new_uuid = str(uuid.uuid1(32132131))
 
-        self.connection.query(
-            [
-                src_table.insert_rows((str(uuid.uuid1(i)), str(i)) for i in range(100)),
-                table(self.table_dst_path).create(src_table),
-                src_table.insert_row(self.new_uuid, "This one is different"),
-                commit,
-            ]
-        )
+        queries = [
+            src_table.insert_rows((str(uuid.uuid1(i)), str(i)) for i in range(100)),
+            table(self.table_dst_path).create(src_table),
+            src_table.insert_row(self.new_uuid, "This one is different"),
+            commit,
+        ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
+
+        self.connection.query(queries)
 
         self.a = table_segment(
             self.connection, self.table_src_path, "id", extra_columns=("text_comment",), case_sensitive=False
@@ -417,9 +422,11 @@ class TestAlphanumericKeys(DiffTestCase):
             src_table.insert_row(self.new_alphanum, "This one is different"),
             commit,
         ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
 
-        for query in queries:
-            self.connection.query(query, None)
+        self.connection.query(queries, None)
 
         self.a = table_segment(self.connection, self.table_src_path, "id", "text_comment", case_sensitive=False)
         self.b = table_segment(self.connection, self.table_dst_path, "id", "text_comment", case_sensitive=False)
@@ -463,6 +470,9 @@ class TestVaryingAlphanumericKeys(DiffTestCase):
             src_table.insert_row(self.new_alphanum, "This one is different"),
             commit,
         ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
 
         self.connection.query(queries)
 
@@ -545,14 +555,17 @@ class TestTableUUID(DiffTestCase):
 
         self.null_uuid = str(uuid.uuid1(32132131))
 
-        self.connection.query(
-            [
-                src_table.insert_rows(values),
-                table(self.table_dst_path).create(src_table),
-                src_table.insert_row(self.null_uuid, None),
-                commit,
-            ]
-        )
+        queries = [
+            src_table.insert_rows(values),
+            table(self.table_dst_path).create(src_table),
+            src_table.insert_row(self.null_uuid, None),
+            commit,
+        ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
+
+        self.connection.query(queries)
 
         self.a = table_segment(self.connection, self.table_src_path, "id", "text_comment", case_sensitive=False)
         self.b = table_segment(self.connection, self.table_dst_path, "id", "text_comment", case_sensitive=False)
@@ -573,14 +586,18 @@ class TestTableNullRowChecksum(DiffTestCase):
         src_table = self.src_table
 
         self.null_uuid = str(uuid.uuid1(1))
-        self.connection.query(
-            [
-                src_table.insert_row(str(uuid.uuid1(1)), "1"),
-                table(self.table_dst_path).create(src_table),
-                src_table.insert_row(self.null_uuid, None),  # Add a row where a column has NULL value
-                commit,
-            ]
-        )
+
+        queries = [
+            src_table.insert_row(str(uuid.uuid1(1)), "1"),
+            table(self.table_dst_path).create(src_table),
+            src_table.insert_row(self.null_uuid, None),  # Add a row where a column has NULL value
+            commit,
+        ]
+        if isinstance(self.connection, db.Dremio):
+            # Dremio metadata tables are updated lazily, so need to read from the table after creating it.
+            queries.append(self.dst_table.select().limit(1))
+
+        self.connection.query(queries)
 
         self.a = table_segment(self.connection, self.table_src_path, "id", "text_comment", case_sensitive=False)
         self.b = table_segment(self.connection, self.table_dst_path, "id", "text_comment", case_sensitive=False)
