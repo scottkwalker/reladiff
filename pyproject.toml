@@ -32,7 +32,7 @@ rich = "*"
 toml = ">=0.10.2"
 # TODO scott: After the sqeleton fork is merged, change this from a github reference back to a pypi version number.
 #sqeleton = "^0.1.8"
-sqeleton = { git = "https://github.com/scottkwalker/sqeleton", rev = "03c1d59aa180d8f1bb0eef82900bfa6caa607248" }
+sqeleton = { git = "https://github.com/scottkwalker/sqeleton", rev = "a5656ebb02c217a1759983583815f2cf5637cf27" }
 mysql-connector-python = {version=">=8.0.29", optional=true}
 psycopg2-binary = {version="*", optional=true}
 snowflake-connector-python = {version=">=2.7.2", optional=true}
