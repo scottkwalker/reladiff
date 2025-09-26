@@ -119,7 +119,7 @@ services:
 
     dremio:
         container_name: dd-dremio
-        image: dremio/dremio-oss:latest
+        image: dremio/dremio-oss:26.0.0
         restart: always
         ports:
           - '9047:9047'
