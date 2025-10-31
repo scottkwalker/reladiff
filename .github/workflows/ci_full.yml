@@ -6,8 +6,6 @@ on:
 #       - '**.py'
 #       - '.github/workflows/**'
 #       - '!dev/**'
-#       - 'pyproject.toml'
-#       - 'poetry.lock'
     pull_request:
         paths:
           - '**.py'
